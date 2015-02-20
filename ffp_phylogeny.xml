@@ -1,0 +1,284 @@
+<tool id="ffp_phylogeny" name="Feature Frequency Profile Phylogeny" version="0.1.00">
+	<description>An alignment free comparison tool for phylogenetic analysis and text comparison</description>
+	<requirements>
+		<requirement type="package" version="0.3.19_d4382db015acec0e5cc43d6c1ac80ae12cb7e6b3">ffp-phylogeny</requirement>
+	</requirements>
+	
+	<macros>
+		<token name="@BINARY@">./ffp_phylogeny.py</token>
+		<import>ffp_macros.xml</import>
+	</macros>
+	<expand macro="requirements" />
+   <command interpreter="python"><![CDATA[
+		ffp_phylogeny.py
+		#for $i in $sequence.filesin
+			"$i" ## full file paths
+		#end for
+		-x "
+		#for $i in $sequence.filesin
+			$i.name, ## original file names
+		#end for
+		"
+		-t "$(sequence.file_type.split('-')[0])"
+		-l "$length"
+		-o "$info"
+		##if $normalize:
+		##	-n
+		##end if
+		#if $sequence.file_type != 'text':
+			#if $sequence.file_type.find('multi') > 0:
+				-m
+			#end if
+			#if $sequence.grouping:
+				-d
+			#end if
+			#if $metric:
+				-M "$metric"
+			#end if
+			#if $similarity:
+				-s
+			#end if
+			#if $abbreviate:
+				-a
+			#end if			
+		#end if
+		#if $phylogeny.phylo_type == 'filter':
+			-f "$phylogeny.filt.filter_type"
+			-L "$phylogeny.filt.lower"
+			-U "$phylogeny.filt.upper" 
+		#end if
+		#if $tree:
+			-T
+		#end if		
+
+		##ffpjsd -n FLOAT , --normval=FLOAT
+		## For option -e, --euclid, change the n-norm distance (Default is n=2) to any other value where n > 1
+
+    ]]></command>
+    <expand macro="stdio" />
+    <inputs>
+
+		<!-- Either amino acid or nucleotide input -->
+		<!-- Ideally we could determine from file content or suffix what type it is -->
+
+		<param name="length" type="integer" min="1" max="25" label="l-mer length" value="6" help="String of valid characters of this length will be counted.  Synonyms: feature, k-mer, n-gram, k-tuple" size="2"/>
+		<!--
+		<param name="normalize" label="Normalize counts into relative frequency" type="boolean" checked="true" help="" />
+		-->
+		<conditional name="sequence">
+			<param type="select" name="file_type" label="File type" help="Note: For phylogeny display, at least three profiles are required, as files or fasta sequences within a file.">
+				<option value="amino">Amino Acids, one sequence per file</option>
+				<option value="amino-multi">Amino Acids, multiple fasta sequences per file</option>
+				<option value="nucleotide">Nucleic acids, one sequence per file</option>
+				<option value="nucleotide-multi">Nucleic acids, multiple fasta sequences per file</option>
+				<option value="text">Text, single file</option>
+			</param>
+
+			<when value="amino"><!-- ffpaa -->
+				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
+				<param name="grouping" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
+			</when>
+
+			<when value="amino-multi">
+				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
+				<param name="grouping" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
+			</when>
+						
+			<when value="nucleotide"><!-- ffpry -->
+				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />	
+				<param name="grouping" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
+			</when>
+			
+			<when value="nucleotide-multi">
+				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
+				<param name="grouping" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
+			</when>
+
+			<when value="text"><!-- ffptxt -->
+				<param name="filesin" type="data" multiple="true"/>						
+			</when>
+
+
+       	</conditional>
+
+		<conditional name="phylogeny">
+			<param type="select" name="phylo_type" label="Feature filtering">
+				<option value="all">Include all features (Phenetic phylogeny)</option>
+				<option value="filt">Include only filtered features (Core/evolutionary phylogeny) </option>
+			</param>
+			<when value="all"></when>
+			<when value="filt">
+				<conditional name="filt">
+				
+					<param type="select" name="filter_type" label="Filter type" help="Features are included in profiles if at least 1 profile has lower count/percent, and no profile has more than upper count/percent">
+						<option value="count">lower / upper count limit</option>
+						<option value="f">raw frequencies</option>
+						<option value="n">normal distribution</option>
+						<option value="e">extreme value (Gumbel) distribution</option>
+					</param>
+					<when value="count">
+						<param name="lower" type="integer" label="lower count (one profile needs at least this)" value="0" min="0" />
+						<param name="upper" type="integer" label="upper count (no profile can have more than this)" value="0" min="0" />		
+					</when>
+					<when value="f">
+						<param name="lower" type="float" label="lower &#37;" value="0.05" min="0" max=".5" />
+						<param name="upper" type="float" label="upper &#37;" value="0.95" min=".5" max="1" />		
+					</when>
+					<when value="n">
+						<param name="lower" type="float" label="lower &#37;" value="0.05" min="0" max=".5" />
+						<param name="upper" type="float" label="upper &#37;" value="0.95" min=".5" max="1" />		
+					</when>
+					<when value="e">
+						<param name="lower" type="float" label="lower &#37;" value="0.05" min="0" max=".5" />
+						<param name="upper" type="float" label="upper &#37;" value="0.95" min=".5" max="1" />		
+					</when>
+					
+				</conditional>
+			</when>
+
+		</conditional>
+
+		<param type="select" name="metric" label="Continuous Distance Measure" help="See ffpjsd documentation for details.">
+			<option value="" selected="true">Jensen Shannon divergence (default)</option>			
+			<option value="euclid">Euclidean</option>
+			<option value="euclid2">Euclidean squared</option>
+			<option value="cosine">Cosine</option>
+			<option value="manhattan">Manhattan</option>
+			<option value="pearson">pearson correlation coefficient*</option>
+			<option value="chebyshev">Chebyshev</option>
+			<option value="canberra">Canberra</option>
+			<option value="hamming">Hamming</option>
+			<option value="evol">Evolutionary Distance used in E.coli Publications</option>
+
+<!--
+
+With these options the input FFPs are treated as binary data. When two FFPs (i and j) are compared each
+distance measure uses a cross tabulation for pairwise feature comparison with sums A, B, C and D. A is
+the number of features which are present in both vectors while D is the number of features that are absent in
+both vectors. B means the feature is present in i and absent in j. C means the feature is absent in i but
+present in j. N is the sum of A+B+C+D. All of the binary distance options can be used together with the -s
+option to print a similarity matrix. THe binary distance do not need to be normalized with ffprwn.
+
+			<option value="">BINARY DISTANCE MEASURES</option>
+			
+-->
+
+			<option value="matching">matching*</option>
+			<option value="jaccard">Jaccard*</option>
+			<option value="tanimoto">Rogers-Tanimoto*</option>
+			<option value="dice">Dice*</option>
+			<option value="antidice">anti-Dice*</option>
+			<option value="sneath">Sneath-Sokal*</option>
+			<option value="hamman">Hamman*</option>
+			<option value="phi">Pearson Phi*</option>
+			<option value="anderberg">Anderberg*</option>
+			<option value="gower">Gower*</option>
+			<option value="russel">Russel-Rao*</option>
+			<option value="yule">Yule*</option>
+			<option value="ochiai">Ochiai*</option>
+			<option value="kulczynski">Kulczynski*</option>
+
+		</param>
+		
+		<param type="boolean" name="similarity" label="*Similarity Matrix" help="Print a similarity matrix rather than a distance matrix for items marked by asterisk(*). This option effects the output of distances metrics which have a value normalized from 0 to 1 or -1 to 1."/>
+
+		<param type="boolean" name="abbreviate" label="Short labels" help="Shorten tree taxonomy labels as much as possible."/>
+
+		<param type="boolean" name="tree" checked="true" label="Generate Tree Phylogeny" truevalue="1" falsevalue="0" />
+
+    </inputs>
+    <outputs>
+        <data name="info" format="nhx" label="Feature Frequency Profile">
+			<change_format>
+				<when input="tree" value="0" format="tabular"/>
+			</change_format>
+			<!-- doesn't work: filter>tree == "1"</filter -->
+		</data>
+    </outputs>
+
+	<tests>
+		<test>
+			<param name="length" value="1"/>
+			<param name="tree" value="0"/>
+			<param name="grouping" value="true"/>
+			<param name="file_type" value="nucleotide"/>
+			<param name="filesin" value="genome1,genome2"/>
+			<output name="info" file="test_length_1_output.tabular"/>
+		</test>
+		<test>
+			<param name="length" value="2"/>
+			<param name="tree" value="0"/>
+			<param name="grouping" value="true"/>
+			<param name="file_type" value="nucleotide"/>
+			<param name="filesin" value="genome1,genome2"/>
+			<output name="info" file="test_length_2_output.tabular"/>
+		</test>
+	</tests>
+
+    <help><![CDATA[
+    
+.. class:: infomark
+
+
+**What it does**
+
+FFP (Feature frequency profile) is an alignment free comparison tool for phylogenetic analysis and text comparison. It can be applied to nucleotide sequences, complete genomes, proteomes and even used for text comparison.
+
+This galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] &gt; [ ffpfilt | ffpcol &gt; ffprwn] &gt; ffpjsd &gt; ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output a distance matrix rather than a Newick (.nhx) formatted tree file.
+
+Each sequence or text file has a profile containing tallies of each feature found.  A feature is a string of valid characters of given length. 
+
+For nucleotide data, by default each character (ATGC) is grouped as either purine(R) or pyrmidine(Y) before being counted.
+
+For amino acid data, by default each character is grouped into one of the following:
+(ST),(DE),(KQR),(IVLM),(FWY),C,G,A,N,H,P. Each group is represented by the first character in its series.
+
+One other key concept is that a given feature, e.g. "TAA" is counted in forward 
+AND reverse directions, mirroring the idea that a feature&apos;s orientation is not
+so important to distinguish when it comes to alignment-free comparison.  
+The counts for "TAA" and "AAT" are merged.
+ 
+The labeling of the resulting counted feature items is perhaps the trickiest
+concept to master.  Due to computational efficiency measures taken by the 
+developers, a feature that we see on paper as "TAC" may be stored and labeled 
+internally as "GTA", its reverse compliment.  One must look for the alternative
+if one does not find the original. 
+
+Also note that in amino acid sequences the stop codon "*" (or any other character 
+that is not in the Amino acid alphabet) causes that character frame not to be
+counted.  Also, character frames never span across fasta entries.
+
+A few tutorials:
+ * http://sourceforge.net/projects/ffp-phylogeny/files/Documentation/tutorial.pdf
+ * https://github.com/apetkau/microbial-informatics-2014/tree/master/labs/ffp-phylogeny
+
+-------
+
+.. class:: warningmark
+
+**Note**
+
+Taxonomy label details: If each file contains one profile, the file's name is used to label the profile.
+If each file contains fasta sequences to profile individually, their fasta identifiers will be used to label them.
+The "short labels" option will find the shortest label that uniquely identifies each profile.
+Either way, there are some quirks: ffpjsd clips labels to 10 characters if they are greater than 50 characters, so all labels are trimmed to 50 characters first.
+Also "id" is prefixed to any numeric label since some tree visualizers won't show purely numeric labels.
+In the accidental case where a Fasta sequence label is a duplicate of a previous one it will be prefixed by "DupLabel-".
+
+The command line ffpjsd can hang if one provides an l-mer length greater than the length of file content.
+One must identify its process id (">ps aux | grep ffpjsd") and kill it (">kill [process id]").
+-------
+
+**References**
+
+The original ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .
+This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .
+ 
+The development of the ff-phylogeny should be attributed to:
+
+Sims GE, Jun S-R, Wu GA, Kim S-H. Alignment-free genome comparison with feature frequency profiles (FFP) and optimal resolutions. Proceedings of the National Academy of Sciences of the United States of America 2009;106(8):2677-2682. doi:10.1073/pnas.0813249106.
+
+    ]]></help>
+</tool>
+
+

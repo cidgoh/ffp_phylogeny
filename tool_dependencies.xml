@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<tool_dependency>
+	<package name="ffp-phylogeny" version="0.3.19_d4382db015acec0e5cc43d6c1ac80ae12cb7e6b3">
+		<install version="1.0">
+			<actions>
+				<action type="shell_command">git clone https://github.com/apetkau/ffp-3.19-custom.git ffp-phylogeny</action>
+				<action type="shell_command">git reset --hard d4382db015acec0e5cc43d6c1ac80ae12cb7e6b3</action>	
+				<action type="shell_command">./configure --disable-gui --prefix=$INSTALL_DIR</action>				
+				<action type="make_install"></action>
+				<!-- action type="move_directory_files">
+					<source_directory>bin</source_directory>
+					<destination_directory>$INSTALL_DIR/bin</destination_directory>
+				</action -->
+				<action type="set_environment">
+					<environment_variable name="PATH" action="prepend_to">$INSTALL_DIR/bin</environment_variable>
+				</action>
+			</actions>
+		</install>
+		<readme>
+			apetkau/ffp-3.19-custom is a customized version of http://sourceforge.net/projects/ffp-phylogeny/
+		</readme>
+	</package>
+</tool_dependency>
+
