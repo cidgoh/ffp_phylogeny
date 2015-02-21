@@ -7,8 +7,7 @@ Introduction
 
 FFP (Feature frequency profile) is an alignment free comparison tool for phylogenetic analysis and text comparison. It can be applied to nucleotide sequences, complete genomes, proteomes and even used for text comparison.  This software is a Galaxy (http://galaxyproject.org) tool for calculating FFP on one or more fasta sequence or text datasets.
 
-The original command line ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .
-This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .
+The original command line ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .  This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .
 
 This Galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] > [ ffpfilt | ffpcol > ffprwn] > ffpjsd > ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output a distance matrix rather than a Newick (.nhx) formatted tree file.
 
@@ -16,43 +15,25 @@ Each sequence or text file has a profile containing tallies of each feature foun
 
 For nucleotide data, by default each character (ATGC) is grouped as either purine(R) or pyrmidine(Y) before being counted.
 
-For amino acid data, by default each character is grouped into one of the following:
-(ST),(DE),(KQR),(IVLM),(FWY),C,G,A,N,H,P. Each group is represented by the first character in its series.
+For amino acid data, by default each character is grouped into one of the following: (ST),(DE),(KQR),(IVLM),(FWY),C,G,A,N,H,P. Each group is represented by the first character in its series.
 
-One other key concept is that a given feature, e.g. "TAA" is counted in forward 
-AND reverse directions, mirroring the idea that a feature&apos;s orientation is not
-so important to distinguish when it comes to alignment-free comparison.  
-The counts for "TAA" and "AAT" are merged.
+One other key concept is that a given feature, e.g. "TAA" is counted in forward AND reverse directions, mirroring the idea that a feature's orientation is not so important to distinguish when it comes to alignment-free comparison.  The counts for "TAA" and "AAT" are merged.
  
-The labeling of the resulting counted feature items is perhaps the trickiest
-concept to master.  Due to computational efficiency measures taken by the 
-developers, a feature that we see on paper as "TAC" may be stored and labeled 
-internally as "GTA", its reverse compliment.  One must look for the alternative
-if one does not find the original. 
+The labeling of the resulting counted feature items is perhaps the trickiest concept to master.  Due to computational efficiency measures taken by the developers, a feature that we see on paper as "TAC" may be stored and labeled internally as "GTA", its reverse compliment.  One must look for the alternative if one does not find the original. 
 
-Also note that in amino acid sequences the stop codon "*" (or any other character 
-that is not in the Amino acid alphabet) causes that character frame not to be
-counted.  Also, character frames never span across fasta entries.
+Also note that in amino acid sequences the stop codon "*" (or any other character that is not in the Amino acid alphabet) causes that character frame not to be counted.  Also, character frames never span across fasta entries.
 
 A few tutorials:
  * http://sourceforge.net/projects/ffp-phylogeny/files/Documentation/tutorial.pdf
  * https://github.com/apetkau/microbial-informatics-2014/tree/master/labs/ffp-phylogeny
 
 -------
-
-.. class:: warningmark
-
 **Note**
 
-Taxonomy label details: If each file contains one profile, the file's name is used to label the profile.
-If each file contains fasta sequences to profile individually, their fasta identifiers will be used to label them.
-The "short labels" option will find the shortest label that uniquely identifies each profile.
-Either way, there are some quirks: ffpjsd clips labels to 10 characters if they are greater than 50 characters, so all labels are trimmed to 50 characters first.
-Also "id" is prefixed to any numeric label since some tree visualizers won't show purely numeric labels.
-In the accidental case where a Fasta sequence label is a duplicate of a previous one it will be prefixed by "DupLabel-".
+Taxonomy label details: If each file contains one profile, the file's name is used to label the profile.  If each file contains fasta sequences to profile individually, their fasta identifiers will be used to label them.  The "short labels" option will find the shortest label that uniquely identifies each profile.
+Either way, there are some quirks: ffpjsd clips labels to 10 characters if they are greater than 50 characters, so all labels are trimmed to 50 characters first.  Also "id" is prefixed to any numeric label since some tree visualizers won't show purely numeric labels.  In the accidental case where a Fasta sequence label is a duplicate of a previous one it will be prefixed by "DupLabel-".
 
-The command line ffpjsd can hang if one provides an l-mer length greater than the length of file content.
-One must identify its process id (">ps aux | grep ffpjsd") and kill it (">kill [process id]").
+The command line ffpjsd can hang if one provides an l-mer length greater than the length of file content.  One must identify its process id ("ps aux | grep ffpjsd") and kill it ("kill [process id]").
 -------
 
 **References**
