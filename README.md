@@ -30,12 +30,11 @@ A few tutorials:
 -------
 **Note**
 
-Taxonomy label details: If each file contains one profile, the file's name is used to label the profile.  If each file contains fasta sequences to profile individually, their fasta identifiers will be used to label them.  The "short labels" option will find the shortest label that uniquely identifies each profile.
-Either way, there are some quirks: ffpjsd clips labels to 10 characters if they are greater than 50 characters, so all labels are trimmed to 50 characters first.  Also "id" is prefixed to any numeric label since some tree visualizers won't show purely numeric labels.  In the accidental case where a Fasta sequence label is a duplicate of a previous one it will be prefixed by "DupLabel-".
+Taxonomy label details: If each file contains one profile, the file's name is used to label the profile.  If each file contains fasta sequences to profile individually, their fasta identifiers will be used to label them.  The "short labels" option will find the shortest label that uniquely identifies each profile.  Either way, there are some quirks: ffpjsd clips labels to 10 characters if they are greater than 50 characters, so all labels are trimmed to 50 characters first.  Also "id" is prefixed to any numeric label since some tree visualizers won't show purely numeric labels.  In the accidental case where a Fasta sequence label is a duplicate of a previous one it will be prefixed by "DupLabel-".
 
 The command line ffpjsd can hang if one provides an l-mer length greater than the length of file content.  One must identify its process id ("ps aux | grep ffpjsd") and kill it ("kill [process id]").
--------
 
+-------
 **References**
  
 The development of the ff-phylogeny should be attributed to:
