@@ -37,7 +37,7 @@ The command line ffpjsd can hang if one provides an l-mer length greater than th
 -------
 **References**
  
-The development of the ff-phylogeny should be attributed to:
+The development of the ffp-phylogeny command line software should be attributed to:
 
 Sims GE, Jun S-R, Wu GA, Kim S-H. Alignment-free genome comparison with feature frequency profiles (FFP) and optimal resolutions. Proceedings of the National Academy of Sciences of the United States of America 2009;106(8):2677-2682. doi:10.1073/pnas.0813249106.
 
