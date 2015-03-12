@@ -7,7 +7,7 @@ Introduction
 
 FFP (Feature frequency profile) is an alignment free comparison tool for phylogenetic analysis and text comparison. It can be applied to nucleotide sequences, complete genomes, proteomes and even used for text comparison.  This software is a Galaxy (http://galaxyproject.org) tool for calculating FFP on one or more fasta sequence or text datasets.
 
-The original command line ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .  This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .
+The original command line ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .  This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .  Aaron has quite a good writeup of the technique as well at https://github.com/apetkau/microbial-informatics-2014/tree/master/labs/ffp-phylogeny .
 
 This Galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] > [ ffpfilt | ffpcol > ffprwn] > ffpjsd > ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output a distance matrix rather than a Newick (.nhx) formatted tree file.
 
