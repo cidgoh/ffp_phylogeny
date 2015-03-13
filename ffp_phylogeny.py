@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import optparse
+import re
 import time
 import os
 import tempfile
@@ -160,8 +161,10 @@ def check_output(command):
 	commands = command.split("|")
 	processes = []
 	ptr = 0
+	substantive = re.compile('[a-zA-Z0-9]+')
+	
 	for command_line in commands:
-		print 'testing,' , command_line.strip()
+		print command_line.strip()
 		args = shlex.split(command_line.strip())
 		if ptr == 0:
 			proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -175,7 +178,8 @@ def check_output(command):
 			# error code signal for that process, i.e. so that retcode returns a code.
 			retcode = processes[ptr-1].poll()
 			stderrdata = processes[ptr-1].stderr.read()
-			if retcode or len(stderrdata) > 0:
+			#Issue with ffptree is it outputs ----....---- on stderr
+			if retcode or (len(stderrdata) > 0 and substantive.search(stderrdata)):
 				stop_err(stderrdata)			
 
 			processes.append(newProcess)			
@@ -185,7 +189,7 @@ def check_output(command):
 
 	retcode = processes[ptr-1].poll()
 	(stdoutdata, stderrdata) = processes[ptr-1].communicate()
-	if retcode or len(stderrdata) > 0:
+	if retcode or (len(stderrdata) > 0 and substantive.search(stderrdata)):
 		stop_err(stderrdata)
 	
 	return stdoutdata
@@ -341,7 +345,7 @@ class ReportEngine(object):
 			else:
 				stop_err("For a phylogenetic tree display, one must have at least 3 ffp profiles.")
 
-		print command
+		#print command
 		
 		result = check_output(command)
 		with open(options.output,'w') as fw:
