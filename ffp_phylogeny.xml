@@ -29,7 +29,7 @@
 			#if $sequence.file_type.find('multi') > 0:
 				-m
 			#end if
-			#if $sequence.grouping:
+			#if not $sequence.grouping:
 				-d
 			#end if
 			#if $metric:
@@ -66,11 +66,11 @@
 		<param name="normalize" label="Normalize counts into relative frequency" type="boolean" checked="true" help="" />
 		-->
 		<conditional name="sequence">
-			<param type="select" name="file_type" label="File type" help="Note: For phylogeny display, at least three profiles are required, as files or fasta sequences within a file.">
-				<option value="amino">Amino Acids, one sequence per file</option>
-				<option value="amino-multi">Amino Acids, multiple fasta sequences per file</option>
-				<option value="nucleotide">Nucleic acids, one sequence per file</option>
-				<option value="nucleotide-multi">Nucleic acids, multiple fasta sequences per file</option>
+			<param type="select" name="file_type" label="File type" help="Note: For phylogeny display, at least three profiles are required.">
+				<option value="amino">Amino Acids, one profile per file</option>
+				<option value="amino-multi">Amino Acids, one profile per fasta sequence in file</option>
+				<option value="nucleotide">Nucleic acids, one profile per file</option>
+				<option value="nucleotide-multi">Nucleic acids, one profile per fasta sequence in file</option>
 				<option value="text">Text, single file</option>
 			</param>
 
@@ -200,7 +200,7 @@ option to print a similarity matrix. THe binary distance do not need to be norma
 		<test>
 			<param name="length" value="1"/>
 			<param name="tree" value="0"/>
-			<param name="grouping" value="true"/>
+			<param name="grouping" value="false"/>
 			<param name="file_type" value="nucleotide"/>
 			<param name="filesin" value="genome1,genome2"/>
 			<output name="info" file="test_length_1_output.tabular"/>
@@ -208,7 +208,7 @@ option to print a similarity matrix. THe binary distance do not need to be norma
 		<test>
 			<param name="length" value="2"/>
 			<param name="tree" value="0"/>
-			<param name="grouping" value="true"/>
+			<param name="grouping" value="false"/>
 			<param name="file_type" value="nucleotide"/>
 			<param name="filesin" value="genome1,genome2"/>
 			<output name="info" file="test_length_2_output.tabular"/>
@@ -224,7 +224,7 @@ option to print a similarity matrix. THe binary distance do not need to be norma
 
 FFP (Feature frequency profile) is an alignment free comparison tool for phylogenetic analysis and text comparison. It can be applied to nucleotide sequences, complete genomes, proteomes and even used for text comparison.
 
-This galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] &gt; [ ffpfilt | ffpcol &gt; ffprwn] &gt; ffpjsd &gt; ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output a distance matrix rather than a Newick (.nhx) formatted tree file.
+This galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] > [ ffpfilt | ffpcol > ffprwn] > ffpjsd > ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output only the precursor distance matrix file rather than a Newick (.nhx) formatted tree file.
 
 Each sequence or text file has a profile containing tallies of each feature found.  A feature is a string of valid characters of given length. 
 

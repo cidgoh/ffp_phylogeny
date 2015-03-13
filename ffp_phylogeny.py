@@ -161,27 +161,30 @@ def check_output(command):
 	processes = []
 	ptr = 0
 	for command_line in commands:
-		print command_line.strip()
+		print 'testing,' , command_line.strip()
 		args = shlex.split(command_line.strip())
 		if ptr == 0:
 			proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			processes.append(proc)
 		else:
+
+			#this has to come before error processing?
+			newProcess = subprocess.Popen(args, stdin=processes[ptr-1].stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			
 			# It seems the act of reading standard error output is enough to trigger
 			# error code signal for that process, i.e. so that retcode returns a code.
-			stderrdata = processes[ptr-1].stderr.read()
 			retcode = processes[ptr-1].poll()
+			stderrdata = processes[ptr-1].stderr.read()
 			if retcode or len(stderrdata) > 0:
-				stop_err(stderrdata)
+				stop_err(stderrdata)			
 
-			newProcess = subprocess.Popen(args, stdin=processes[ptr-1].stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			processes.append(newProcess)
+			processes.append(newProcess)			
 			processes[ptr-1].stdout.close() # Allow prev. process to receive a SIGPIPE if current process exits.
 		
 		ptr += 1
 
-	(stdoutdata, stderrdata) = processes[ptr-1].communicate()
 	retcode = processes[ptr-1].poll()
+	(stdoutdata, stderrdata) = processes[ptr-1].communicate()
 	if retcode or len(stderrdata) > 0:
 		stop_err(stderrdata)
 	
@@ -322,6 +325,7 @@ class ReportEngine(object):
 		#Now create a taxonomy label file, ensuring a name exists for each profile.
 		taxonomyNames = getTaxonomyNames(options.type, options.multiple, options.abbreviate, in_files, options.taxonomy)
 		taxonomyTempFile = getTaxonomyFile(taxonomyNames)
+		
 		# -p = Include phylip format 'infile' of the taxon names to use.  Very simple, just a list of fasta identifier names.
 		command += ' | ffpjsd -p ' + taxonomyTempFile
 
@@ -337,6 +341,8 @@ class ReportEngine(object):
 			else:
 				stop_err("For a phylogenetic tree display, one must have at least 3 ffp profiles.")
 
+		print command
+		
 		result = check_output(command)
 		with open(options.output,'w') as fw:
 			fw.writelines(result)
