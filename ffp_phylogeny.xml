@@ -1,4 +1,4 @@
-<tool id="ffp_phylogeny" name="Feature Frequency Profile Phylogeny" version="0.1.00">
+<tool id="ffp_phylogeny" name="Feature Frequency Profile Phylogeny" version="0.1.02">
 	<description>An alignment free comparison tool for phylogenetic analysis and text comparison</description>
 	<requirements>
 		<requirement type="package" version="0.3.19_d4382db015acec0e5cc43d6c1ac80ae12cb7e6b3">ffp-phylogeny</requirement>
@@ -22,35 +22,36 @@
 		-t "$(sequence.file_type.split('-')[0])"
 		-l "$length"
 		-o "$info"
-		##if $normalize:
+		##if $normalize
 		##	-n
 		##end if
-		#if $sequence.file_type != 'text':
-			#if $sequence.file_type.find('multi') > 0:
+		#if $sequence.file_type != 'text'
+			#if $sequence.file_type == 'amino-multi' or $sequence.file_type == 'nucleotide-multi'
 				-m
 			#end if
-			#if not $sequence.grouping:
+			#if $sequence.groupings
+				#pass
+			#else
 				-d
 			#end if
-			#if $metric:
+			#if $metric
 				-M "$metric"
 			#end if
-			#if $similarity:
+			#if $similarity
 				-s
 			#end if
-			#if $abbreviate:
+			#if $abbreviate
 				-a
 			#end if			
 		#end if
-		#if $phylogeny.phylo_type == 'filter':
+		#if $phylogeny.phylo_type == 'filter'
 			-f "$phylogeny.filt.filter_type"
 			-L "$phylogeny.filt.lower"
 			-U "$phylogeny.filt.upper" 
 		#end if
-		#if $tree:
+		#if $tree
 			-T
 		#end if		
-
 		##ffpjsd -n FLOAT , --normval=FLOAT
 		## For option -e, --euclid, change the n-norm distance (Default is n=2) to any other value where n > 1
 
@@ -76,22 +77,22 @@
 
 			<when value="amino"><!-- ffpaa -->
 				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
-				<param name="grouping" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
+				<param name="groupings" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
 			</when>
 
 			<when value="amino-multi">
 				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
-				<param name="grouping" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
+				<param name="groupings" label="Enable amino acid grouping" type="boolean" checked="true" help="Counts amino acids in groups rather than individually (usually advantageous, see below)." />
 			</when>
 						
 			<when value="nucleotide"><!-- ffpry -->
 				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />	
-				<param name="grouping" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
+				<param name="groupings" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
 			</when>
 			
 			<when value="nucleotide-multi">
 				<param name="filesin" type="data" label="Select input file(s)" format="fasta" multiple="true" />
-				<param name="grouping" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
+				<param name="groupings" label="Enable purine / pyrimidine grouping" type="boolean" checked="true" help="Counts each nucleotide as a purine(R) or pyrimidine(Y) rather than individually (usually advantageous)." />
 			</when>
 
 			<when value="text"><!-- ffptxt -->
@@ -200,7 +201,7 @@ option to print a similarity matrix. THe binary distance do not need to be norma
 		<test>
 			<param name="length" value="1"/>
 			<param name="tree" value="0"/>
-			<param name="grouping" value="false"/>
+			<param name="groupings" value="false"/>
 			<param name="file_type" value="nucleotide"/>
 			<param name="filesin" value="genome1,genome2"/>
 			<output name="info" file="test_length_1_output.tabular"/>
@@ -208,11 +209,19 @@ option to print a similarity matrix. THe binary distance do not need to be norma
 		<test>
 			<param name="length" value="2"/>
 			<param name="tree" value="0"/>
-			<param name="grouping" value="false"/>
+			<param name="groupings" value="false"/>
 			<param name="file_type" value="nucleotide"/>
 			<param name="filesin" value="genome1,genome2"/>
 			<output name="info" file="test_length_2_output.tabular"/>
 		</test>
+		<test>
+			<param name="length" value="2"/>
+			<param name="tree" value="0"/>
+			<param name="groupings" value="true"/>
+			<param name="file_type" value="nucleotide-multi"/>
+			<param name="filesin" value="genome1,genome2"/>
+			<output name="info" file="test_length_2b_output.tabular"/>
+		</test>		
 	</tests>
 
     <help><![CDATA[
