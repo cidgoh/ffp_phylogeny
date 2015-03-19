@@ -9,6 +9,8 @@ FFP (Feature frequency profile) is an alignment free comparison tool for phyloge
 
 The original command line ffp-phylogeny code is at http://ffp-phylogeny.sourceforge.net/ .  This tool uses Aaron Petkau's modified version: https://github.com/apetkau/ffp-3.19-custom .  Aaron has quite a good writeup of the technique as well at https://github.com/apetkau/microbial-informatics-2014/tree/master/labs/ffp-phylogeny .
 
+**Installation Note** : Your Galaxy server will need the groff package to be installed on it first (to generate ffp-phylogeny man pages).  A cryptic error will occur if it isn't: "troff: fatal error: can't find macro file s".  This is different from the "groff-base" package.
+
 This Galaxy tool prepares a mini-pipeline consisting of **[ffpry | ffpaa | ffptxt] > [ ffpfilt | ffpcol > ffprwn] > ffpjsd > ffptree**  .  The last step is optional - by deselecting the "Generate Tree Phylogeny" checkbox, the tool will output a distance matrix rather than a Newick (.nhx) formatted tree file.
 
 Each sequence or text file has a profile containing tallies of each feature found.  A feature is a string of valid characters of given length. 
