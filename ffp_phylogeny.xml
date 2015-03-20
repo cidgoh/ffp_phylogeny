@@ -1,4 +1,4 @@
-<tool id="ffp_phylogeny" name="Feature Frequency Profile Phylogeny" version="0.1.02">
+<tool id="ffp_phylogeny" name="Feature Frequency Profile Phylogeny" version="0.1.03">
 	<description>An alignment free comparison tool for phylogenetic analysis and text comparison</description>
 	<requirements>
 		<requirement type="package" version="0.3.19_d4382db015acec0e5cc43d6c1ac80ae12cb7e6b3">ffp-phylogeny</requirement>

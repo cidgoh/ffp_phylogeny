@@ -8,7 +8,7 @@ import sys
 import shlex, subprocess
 from string import maketrans
 
-VERSION_NUMBER = "0.1.00"
+VERSION_NUMBER = "0.1.03"
 
 class MyParser(optparse.OptionParser):
 	"""
@@ -40,16 +40,16 @@ def getTaxonomyNames(type, multiple, abbreviate, filepaths, filenames):
 	"""
 	# Take off prefix/suffix whitespace/comma :
 	taxonomy = filenames.strip().strip(',').split(',')
-	translations = maketrans(' .-	','____')
 	names=[]
 	ptr = 0
 
 	for file in filepaths:
-		# First, convert space, period to underscore in file names.	  ffprwn IS VERY SENSITIVE ABOUT THIS.
-		# Also trim labels to 50 characters.  Turns out ffpjsd is kneecapping a taxonomy label to 10 characters if it is greater than 50 chars.
-		taxonomyitem = taxonomy[ptr].strip().translate(translations)[:50]
-		# print taxonomyitem
-		if not type in 'text' and multiple:
+		# Trim labels to 50 characters max.  ffpjsd kneecaps a taxonomy label to 10 characters if it is greater than 50 chars.
+		taxonomyitem = taxonomy[ptr].strip()[:50] #.translate(translations)
+		# Convert non-alphanumeric characters to underscore in taxonomy names.  ffprwn IS VERY SENSITIVE ABOUT THIS.
+		taxonomyitem = re.sub('[^0-9a-zA-Z]+', '_', taxonomyitem)
+
+		if (not type in 'text') and multiple:
 			#Must read each fasta file, looking for all lines beginning ">"
 			with open(file) as fastafile:
 				lineptr = 0
@@ -61,6 +61,7 @@ def getTaxonomyNames(type, multiple, abbreviate, filepaths, filenames):
 						names.append(name)
 						lineptr += 1
 		else:
+
 			names.append(taxonomyitem)
 		
 		ptr += 1
@@ -178,7 +179,7 @@ def check_output(command):
 			# error code signal for that process, i.e. so that retcode returns a code.
 			retcode = processes[ptr-1].poll()
 			stderrdata = processes[ptr-1].stderr.read()
-			#Issue with ffptree is it outputs ----....---- on stderr
+			#Issue with ffptree is it outputs ---- ... ---- on stderr even when ok.
 			if retcode or (len(stderrdata) > 0 and substantive.search(stderrdata)):
 				stop_err(stderrdata)			
 
