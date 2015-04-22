@@ -245,7 +245,7 @@ class ReportEngine(object):
 			help='Enables pearson correlation coefficient matrix and any of the binary distance measures to be turned into similarity matrixes.')
 		
 		parser.add_option('-f', '--filter', type='choice', dest='filter', default='none',
-			choices=['none','f','n','e','freq','norm','evd'],
+			choices=['none','count','f','n','e','freq','norm','evd'],
 			help='Choice of [f=raw frequency|n=normal|e=extreme value (Gumbel)] distribution: Features are trimmed from the data based on lower/upper cutoff points according to the given distribution.')
 
 		parser.add_option('-L', '--lower', type='float', dest='lower', 
